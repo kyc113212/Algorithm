@@ -37,14 +37,17 @@ int main() {
 
 	HashTable* hTable = CreateHashTable(tableSize);
 	printf("Insert Data\n");
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 900; i++) {
 		HashInsert(hTable, i);
+		if ((hTable->numofData / (double)hTable->size) > LOAD_FACTOR) {
+			hTable = ReHash(hTable);
+		}
 	}
 
 	PrintHashTable(hTable);
 
 	printf("delete data\n");
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 200; i++) {
 		HashDelete(hTable, i);
 	}
 
@@ -66,7 +69,7 @@ HashTable* CreateHashTable(int tableSize) {
 
 	htable->size = tableSize;
 	htable->numofData = 0;
-	htable->table = (HashNode * *)malloc(sizeof(HashNode) * tableSize);
+	htable->table = (HashNode **)malloc(sizeof(HashNode*)*tableSize);
 
 	if (!htable->table) {
 		printf("Memory allocation Fail\n");
@@ -109,7 +112,7 @@ int HashSearch(HashTable* hTable, int data) {
 
 void HashInsert(HashTable* hTable, int data) {
 	HashNode* first;
-	first = hTable->table[GetKey(data, hTable->table)];
+	first = hTable->table[GetKey(data, hTable->size)];
 
 	Node* temp;
 	temp = first->list;
@@ -123,7 +126,7 @@ void HashInsert(HashTable* hTable, int data) {
 	node->data = data;
 	node->next = NULL;
 
-	if (!temp)
+	if (!first)
 		first->list = node;
 	else {
 		Node* temp2;
@@ -133,58 +136,54 @@ void HashInsert(HashTable* hTable, int data) {
 	}
 
 	first->count++;
+	hTable->numofData++;
 
-	if ((first->count / hTable->size) > LOAD_FACTOR)
-		hTable = ReHash(hTable);
-
+	return;	
 }
 
 void HashDelete(HashTable* hTable, int data) {
-	HashNode* first;
-	first = hTable->table[GetKey(data, hTable->size)];
+	HashNode* head = hTable->table[GetKey(data, hTable->size)];
+	Node* now = head->list;
+	Node* before = now;
 
-	Node* temp;
-	temp = first->list;
-
-	Node* before = temp;
-	if (!temp)
+	if (!now)
 		return;
-	while (temp) {
-		if (temp->data == data) {
-			if (before == temp) {
-				first->list = temp->next;
+	while (now) {
+		if (now->data == data) {
+			if (now == head->list) {
+				head->list = now->next;
 			}
 			else {
-				before->next = temp->next;
+				before->next = now->next;
 			}
-			free(temp);
+
+			free(now);
+			head->count--;
+			hTable->numofData--;
 			break;
 		}
-		before = temp;
-		temp = temp->next;
+		else {
+			before = now;
+			now = now->next;
+		}
 	}
-	first->count--;
 }
 
 void DeleteHashTable(HashTable* hTable) {
-	for (int i = 0; i < hTable->size; i++) {
-		Node* temp = NULL;
-		Node* before = NULL;
-		temp = hTable->table[i]->list;
-		before = temp;
-		while (temp) {
-			before = temp;
-			temp = temp->next;
-			free(before);
-		}
-	}
 
 	for (int i = 0; i < hTable->size; i++) {
+		struct HashNode* tmp = hTable->table[i];
+		struct Node* now = tmp->list;
+
+		while (!now) {
+			struct Node* next = now->next;
+			free(now);
+			now = next;
+		}
+
 		free(hTable->table[i]);
 	}
 	free(hTable);
-
-	printf("HashTable Delete\n");
 }
 
 void PrintHashTable(HashTable* hTable) {
@@ -194,7 +193,7 @@ void PrintHashTable(HashTable* hTable) {
 		HashNode* first = hTable->table[i];
 		Node* temp = first->list;
 
-		printf("Key %d : ",i);
+		printf("Key %d : ", i);
 		while (temp) {
 			printf("%d ", temp->data);
 			temp = temp->next;
@@ -205,7 +204,7 @@ void PrintHashTable(HashTable* hTable) {
 
 HashTable* ReHash(HashTable* hTable) {
 	HashTable* oldTable = hTable;
-	hTable = CreateHashTable(hTable->size * 2);
+	hTable = CreateHashTable((hTable->size) * 2);
 	if (!hTable) {
 		printf("Memory allocation Fail\n");
 		return NULL;
@@ -215,14 +214,13 @@ HashTable* ReHash(HashTable* hTable) {
 		HashNode* first = oldTable->table[i];
 		Node* temp = first->list;
 
-		while (temp) {
+		while (temp != NULL) {
 			HashInsert(hTable, temp->data);
 			temp = temp->next;
 		}
 	}
 
 	DeleteHashTable(oldTable);
-	printf("Load Factor에 따른 ReHash로 data 분산 완료\n");
+	printf("Load Factor에 따른 ReHash로 data 분산 완료, hTable->size: %d\n", hTable->size);
 	return hTable;
 }
-
