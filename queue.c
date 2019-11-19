@@ -99,7 +99,7 @@ int main() {
 		int num = 0;
 		int string_size = 0;
 		scanf("%s", cmd);
-		for (int j = 0; j < N; j++) {
+		for (int j = 0; j < 10; j++) {
 			if (cmd[j] == '\0') {
 				string_size = j;
 				break;
