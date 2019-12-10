@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <malloc.h>
 
-typedef struct Node{
+typedef struct Node {
 	int data;
 	struct Node *next, *before;
 }Node;
@@ -21,9 +21,10 @@ void initList(LinkedList *ll) {
 }
 
 void insertNode(LinkedList *ll, int pos, int value) {
+
 	Node *newNode = (Node *)malloc(sizeof(Node));
 	newNode->data = value;
-	if(ll->size == 0) {
+	if (ll->size == 0) {
 		printf("push empty list\n");
 		newNode->before = NULL;
 		newNode->next = NULL;
@@ -32,7 +33,7 @@ void insertNode(LinkedList *ll, int pos, int value) {
 		ll->size++;
 		//return;
 	}
-	else if(pos > ll->size) {
+	else if (pos > ll->size) {
 		//newNode->before = NULL;
 		printf("out of size! push tail!\n");
 		ll->tail->next = newNode;
@@ -41,8 +42,8 @@ void insertNode(LinkedList *ll, int pos, int value) {
 		ll->size++;
 		//return;		
 	}
-	else if(pos == 1) {
-		printf("push front!\n");		
+	else if (pos == 1) {
+		printf("push front!\n");
 		newNode->before = NULL;
 		ll->front->before = newNode;
 		newNode->next = ll->front;
@@ -52,8 +53,8 @@ void insertNode(LinkedList *ll, int pos, int value) {
 	}
 	else {
 		Node *tmpNode = ll->front;
-		Node *nextTmpNode = NULL;
-		for(int i = 1; i<pos; i++){
+		Node *nextTmpNode = tmpNode->next;
+		for (int i = 1; i < pos - 1; i++) {
 			tmpNode = tmpNode->next;
 			nextTmpNode = tmpNode->next;
 		}
@@ -68,10 +69,24 @@ void insertNode(LinkedList *ll, int pos, int value) {
 	return;
 }
 
+void deleteList(LinkedList *ll, int pos) {
+	if (ll->size == 0) {
+		printf("list empty!!\n");
+		return;
+	}
+
+	for (int i = 1; i < pos; i++) {
+
+	}
+
+	return;
+}
+
+
 void print_list(LinkedList *ll) {
 	Node *tmpNode = ll->front;
 	printf("print list\n");
-	for(int i = 0; i<ll->size; i++) {
+	for (int i = 0; i < ll->size; i++) {
 		printf("%d ", tmpNode->data);
 		tmpNode = tmpNode->next;
 	}
@@ -83,15 +98,16 @@ void print_list(LinkedList *ll) {
 
 
 
-int main(void){
+int main(void) {
 
 	LinkedList *ll = (LinkedList *)malloc(sizeof(LinkedList));
 	initList(ll);
-	insertNode(ll,1,30);
 	print_list(ll);
-	insertNode(ll,1,20);
 	print_list(ll);
-	insertNode(ll,5,100);
+	print_list(ll);
+	print_list(ll);
+	print_list(ll);
+	print_list(ll);
 
 	return 0;
 }
