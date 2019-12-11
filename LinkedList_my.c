@@ -74,10 +74,43 @@ void deleteList(LinkedList *ll, int pos) {
 		printf("list empty!!\n");
 		return;
 	}
-
-	for (int i = 1; i < pos; i++) {
-
+	if(pos > ll->size) {
+		printf("out of size\n");
+		return;
 	}
+	if(pos == 1) {
+		Node *tmp = ll->front;
+		int tmpdata = ll->front->data;
+		ll->front = tmp->next;
+		ll->front->before = NULL;
+		ll->size--;
+		printf("delete data : %d\n",tmpdata);
+		free(tmp);
+	}
+	else if(pos == ll->size) {
+		Node *tmp = ll->tail;
+		int tmpdata = ll->tail->data;
+		ll->tail = tmp->before;
+		ll->tail->next = NULL;
+		ll->size--;
+		printf("delete data : %d\n",tmpdata);
+		free(tmp);
+	}
+	else {
+		Node *targetNode = ll->front;
+		Node *nexttargetNode = ll->front->next;
+		for (int i = 1; i < pos; i++) {
+			targetNode = targetNode->next;
+			nexttargetNode = targetNode->next;
+		}
+		int tmpdata = targetNode->data;
+		targetNode->before->next = nexttargetNode;
+		nexttargetNode->before = targetNode->before->next;
+		free(targetNode);
+		ll->size--;
+		printf("delete data : %d\n",tmpdata);
+	}
+
 
 	return;
 }
@@ -102,12 +135,22 @@ int main(void) {
 
 	LinkedList *ll = (LinkedList *)malloc(sizeof(LinkedList));
 	initList(ll);
+	insertNode(ll,1,10);
+	insertNode(ll,5,50);
+	insertNode(ll,1,30);
+	insertNode(ll,2,20);
 	print_list(ll);
+	deleteList(ll,1);
+	deleteList(ll,3);
 	print_list(ll);
-	print_list(ll);
-	print_list(ll);
-	print_list(ll);
-	print_list(ll);
+	insertNode(ll,3,100);
+	insertNode(ll,1,70);
+	insertNode(ll,2,50);
+	print_list(ll);	
+	deleteList(ll,4);	
+	print_list(ll);	
+	insertNode(ll,2,80);
+	print_list(ll);	
 
 	return 0;
 }
