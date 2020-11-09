@@ -25,8 +25,19 @@ int main() {
 				st.push(s[i]);
 			}
 			else {
-				if (st.top() == '*' || st.top() == '/') {
+				while (!st.empty() && st.top() != '(') {
+					post += st.top();
+					st.pop();
+				}
+				st.push(s[i]);
+				/*if (st.top() == '*' || st.top() == '/') {
 					while (st.top() != '+' && st.top() != '-' && !st.empty()) {
+						post += st.top();
+						st.pop();
+						if (st.empty())
+							break;
+					}
+					while (!st.empty()) {
 						post += st.top();
 						st.pop();
 						if (st.empty())
@@ -36,11 +47,20 @@ int main() {
 				}
 				else {
 					st.push(s[i]);
-				}
+				}*/
 			}
 		}
 		else if (s[i] == '*' || s[i] == '/') {
-			st.push(s[i]);
+			if (st.empty())
+				st.push(s[i]);
+			else {
+				while (!st.empty() && st.top() != '(' && st.top() != '+' & st.top() != '-') {
+					post += st.top();
+					st.pop();
+				}
+				st.push(s[i]);
+			}
+			//st.push(s[i]);
 		}
 		else if (s[i] == ')') {
 			while (st.top() != '(') {
@@ -71,7 +91,7 @@ int main() {
 			op.pop();
 			b = op.top();
 			op.pop();
-			op.push(a + b);
+			op.push(b + a);
 		}
 		else if (post[i] == '-') {
 			int a, b;
@@ -79,7 +99,7 @@ int main() {
 			op.pop();
 			b = op.top();
 			op.pop();
-			op.push(a - b);
+			op.push(b - a);
 		}
 		else if (post[i] == '*') {
 			int a, b;
@@ -87,7 +107,7 @@ int main() {
 			op.pop();
 			b = op.top();
 			op.pop();
-			op.push(a * b);
+			op.push(b * a);
 		}
 		else if (post[i] == '/') {
 			int a, b;
@@ -95,7 +115,7 @@ int main() {
 			op.pop();
 			b = op.top();
 			op.pop();
-			op.push(a / b);
+			op.push(b / a);
 		}
 
 	}
